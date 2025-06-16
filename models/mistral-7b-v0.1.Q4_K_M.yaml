@@ -1,0 +1,12 @@
+name: mistral-7b-v0.1.Q4_K_M
+backend: llama-cpp
+parameters:
+  model: mistral-7b-v0.1.Q4_K_M.gguf
+  n_ctx: 2048  # Reduce context for lower memory usage and faster response
+  n_gpu_layers: 0  # Set to 0 for CPU only, or adjust for your GPU
+  threads: 8  # Adjust to match your CPU core count for best performance
+  # You can further tune these:
+  # top_k: 40
+  # top_p: 0.9
+  # temperature: 0.7
+  # repeat_penalty: 1.1

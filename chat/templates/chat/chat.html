@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Marvin Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #343541;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .chat-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #444654;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+            overflow: hidden;
+        }
+        .chat-header {
+            padding: 22px 32px;
+            border-bottom: 1px solid #3c3f4a;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #fff;
+            background: #202123;
+            border-radius: 12px 12px 0 0;
+            letter-spacing: 1px;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 32px 32px 16px 32px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            background: #343541;
+        }
+        .msg {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .msg.user .bubble {
+            background: #0074d9;
+            color: #fff;
+            align-self: flex-end;
+        }
+        .msg.ai .bubble {
+            background: #444654;
+            color: #ececf1;
+            border: 1px solid #3c3f4a;
+            align-self: flex-start;
+        }
+        .bubble {
+            padding: 16px 20px;
+            border-radius: 16px;
+            max-width: 70%;
+            font-size: 1.08em;
+            line-height: 1.7;
+            word-break: break-word;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .ai-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #202123;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #19c37d;
+            font-size: 1.3em;
+            border: 2px solid #19c37d;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0074d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+        .chat-input {
+            display: flex;
+            padding: 24px 32px;
+            border-top: 1px solid #3c3f4a;
+            background: #40414f;
+            border-radius: 0 0 12px 12px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 16px;
+            border: 1px solid #3c3f4a;
+            border-radius: 8px;
+            font-size: 1.08em;
+            outline: none;
+            background: #343541;
+            color: #ececf1;
+        }
+        .chat-input button {
+            margin-left: 16px;
+            padding: 16px 28px;
+            background: #19c37d;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.08em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .chat-input button:active {
+            background: #179b5c;
+        }
+        ::placeholder {
+            color: #b4bcd0;
+            opacity: 1;
+        }
+        @media (max-width: 800px) {
+            .chat-container { max-width: 98vw; }
+            .chat-header, .chat-input, .chat-messages { padding-left: 10px; padding-right: 10px; }
+        }
+        .typing-indicator {
+            display: inline-block;
+            width: 2em;
+            color: #19c37d;
+            font-weight: bold;
+            font-size: 1.2em;
+            vertical-align: middle;
+            margin-left: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <div class="chat-header">Marvin</div>
+    <div class="chat-messages" id="messages">
+        <div class="msg ai">
+            <div class="ai-avatar">🤖</div>
+            <div class="bubble">Hi! I am Marvin, your AI assistant. How can I help you today?</div>
+        </div>
+    </div>
+    <form class="chat-input" id="chat-form" autocomplete="off">
+        <input id="input" type="text" placeholder="Type your message..." autocomplete="off" />
+        <button type="submit">Send</button>
+    </form>
+</div>
+<script>
+const messages = document.getElementById('messages');
+const input = document.getElementById('input');
+const form = document.getElementById('chat-form');
+
+function addMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'msg ' + sender;
+    const avatar = document.createElement('div');
+    avatar.className = sender === 'ai' ? 'ai-avatar' : 'user-avatar';
+    avatar.textContent = sender === 'ai' ? '🤖' : '🧑';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    msgDiv.appendChild(avatar);
+    msgDiv.appendChild(bubble);
+    messages.appendChild(msgDiv);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+form.onsubmit = function(e) {
+    e.preventDefault();
+    const userMsg = input.value.trim();
+    if (!userMsg) return;
+    addMessage(userMsg, 'user');
+    input.value = '';
+    input.disabled = true;
+    form.querySelector('button').disabled = true;
+    // Add placeholder for AI response
+    const aiMsgDiv = document.createElement('div');
+    aiMsgDiv.className = 'msg ai';
+    const aiAvatar = document.createElement('div');
+    aiAvatar.className = 'ai-avatar';
+    aiAvatar.textContent = '🤖';
+    const aiBubble = document.createElement('div');
+    aiBubble.className = 'bubble';
+    aiBubble.textContent = '';
+    aiMsgDiv.appendChild(aiAvatar);
+    aiMsgDiv.appendChild(aiBubble);
+    messages.appendChild(aiMsgDiv);
+    messages.scrollTop = messages.scrollHeight;
+
+    // Typing indicator
+    const typingDots = document.createElement('span');
+    typingDots.className = 'typing-indicator';
+    typingDots.textContent = '...';
+    aiBubble.appendChild(typingDots);
+    let dots = 0;
+    let typingInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        typingDots.textContent = '.'.repeat(dots) || '...';
+    }, 400);
+
+    fetch('/stream/?message=' + encodeURIComponent(userMsg))
+        .then(response => {
+            if (!response.body) throw new Error('No response body');
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            function read() {
+                reader.read().then(({ done, value }) => {
+                    if (done) {
+                        clearInterval(typingInterval);
+                        typingDots.remove();
+                        input.disabled = false;
+                        form.querySelector('button').disabled = false;
+                        return;
+                    }
+                    buffer += decoder.decode(value, { stream: true });
+                    let lines = buffer.split('\n');
+                    buffer = lines.pop();
+                    for (let line of lines) {
+                        console.log('[Stream] Line:', line);
+                        if (line.startsWith('data: ')) {
+                            let chunk = line.slice(6);
+                            console.log('[Stream] Chunk:', chunk);
+                            if (chunk.startsWith('[Error:')) {
+                                clearInterval(typingInterval);
+                                typingDots.remove();
+                                aiBubble.textContent = chunk;
+                                input.disabled = false;
+                                form.querySelector('button').disabled = false;
+                                return;
+                            }
+                            if (typingDots.parentNode) typingDots.remove();
+                            aiBubble.textContent += chunk;
+                            aiBubble.appendChild(typingDots);
+                            messages.scrollTop = messages.scrollHeight;
+                        }
+                    }
+                    read();
+                });
+            }
+            read();
+        })
+        .catch(err => {
+            clearInterval(typingInterval);
+            typingDots.remove();
+            aiBubble.textContent = '[Error: ' + err.message + ']';
+            input.disabled = false;
+            form.querySelector('button').disabled = false;
+        });
+};
+</script>
+</body>
+</html>

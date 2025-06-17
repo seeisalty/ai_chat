@@ -25,8 +25,8 @@ Place your Mistral-7B GGUF model and YAML config in the `models/` directory. Exa
 Open a terminal and run:
 ```sh
 # From the project root
-docker build -t localai-mistral .
-docker run --rm -p 5000:5000 localai-mistral
+docker build -t my-llm-server .
+docker run -p 5000:5000 my-llm-server
 ```
 This will start LocalAI and serve the model on `http://localhost:5000`.
 
@@ -42,7 +42,7 @@ python manage.py runserver
 ```
 
 ### 5. Open the Chat UI
-Go to [http://localhost:8000](http://localhost:8000) in your browser.
+Go to [http://localhost:8000] in your browser.
 
 ---
 
